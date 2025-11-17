@@ -1,0 +1,26 @@
+name: deploy-financial-calc-library
+
+on:
+  push:
+    branches: main
+
+jobs:
+  test:
+    name: Run all tests for financial calculations code
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install requirements
+        run: |
+          pip install poetry
+          poetry export -f requirements.txt --output requirements.txt --without-hashes
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run tests
+        run: python -m pytest
