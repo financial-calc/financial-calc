@@ -1,14 +1,14 @@
-'''
+"""
 Financial math operations
 Author: Vitor Beltrao Abdo - vitorbeltrao300@gmail.com
-'''
+"""
 
 import math
 import numpy_financial as npf
 
 
 class capitalization_regime:
-    '''
+    """
     Provides methods for calculating present value, future value, and effective rates
     under various capitalization regimes (linear/simple, exponential/compound, and continuous).
 
@@ -43,17 +43,16 @@ class capitalization_regime:
         - 'continuous' : Continuous compounding and discounting (via dedicated methods)
     - All formulas account for conversion between different time bases, allowing, for example,
       an annualized rate (basis 360 days) to be applied over any number of days.
-    '''
+    """
+
     def __init__(self, term, day_basis):
         self.term = term
         self.day_basis = day_basis
 
     def discrete_present_value(
-            self,
-            target_value: float,
-            fee: float,
-            capitalization_regime: str = 'exp') -> float:
-        '''
+        self, target_value: float, fee: float, capitalization_regime: str = "exp"
+    ) -> float:
+        """
         Calculate the present value for a given future value using the specified capitalization regime.
 
         Parameters
@@ -83,21 +82,19 @@ class capitalization_regime:
         >>> cr = capitalization_regime(term=5, day_basis=1)
         >>> cr.discrete_present_value(30000, 0.08, capitalization_regime='exp')
         20417.5
-        '''
-        if capitalization_regime == 'lin':
+        """
+        if capitalization_regime == "lin":
             present_value = target_value / (1 + (fee * self.term / self.day_basis))
             return present_value
 
-        elif capitalization_regime == 'exp':
+        elif capitalization_regime == "exp":
             present_value = target_value / (1 + fee) ** (self.term / self.day_basis)
             return present_value
 
     def discrete_future_value(
-            self,
-            target_value: float,
-            fee: float,
-            capitalization_regime: str = 'exp') -> float:
-        '''
+        self, target_value: float, fee: float, capitalization_regime: str = "exp"
+    ) -> float:
+        """
         Calculate the future value for a given present value using the specified capitalization regime.
 
         Parameters
@@ -127,21 +124,22 @@ class capitalization_regime:
         >>> cr = capitalization_regime(term=5, day_basis=1)
         >>> cr.discrete_future_value(20000, 0.09, capitalization_regime='lin')
         29000.0
-        '''
-        if capitalization_regime == 'lin':
+        """
+        if capitalization_regime == "lin":
             present_value = target_value * (1 + (fee * self.term / self.day_basis))
             return present_value
 
-        elif capitalization_regime == 'exp':
+        elif capitalization_regime == "exp":
             present_value = target_value * (1 + fee) ** (self.term / self.day_basis)
             return present_value
 
     def discrete_effective_transaction_rate(
-            self,
-            future_target_value: float,
-            present_target_value: float,
-            capitalization_regime: str = 'exp') -> float:
-        '''
+        self,
+        future_target_value: float,
+        present_target_value: float,
+        capitalization_regime: str = "exp",
+    ) -> float:
+        """
         Calculate the effective transaction rate given the present and future values, according to the specified
         capitalization regime.
 
@@ -173,20 +171,22 @@ class capitalization_regime:
         >>> cr = capitalization_regime(term=5, day_basis=1)
         >>> cr.effective_transaction_rate(29000, 20000, capitalization_regime='lin')
         0.09
-        '''
-        if capitalization_regime == 'lin':
-            etr = ((future_target_value / present_target_value) - 1) / (self.term / self.day_basis)
+        """
+        if capitalization_regime == "lin":
+            etr = ((future_target_value / present_target_value) - 1) / (
+                self.term / self.day_basis
+            )
             return etr
 
-        elif capitalization_regime == 'exp':
-            etr = ((future_target_value / present_target_value) ** (1 / (self.term / self.day_basis))) - 1
+        elif capitalization_regime == "exp":
+            etr = (
+                (future_target_value / present_target_value)
+                ** (1 / (self.term / self.day_basis))
+            ) - 1
             return etr
 
-    def continuous_future_value(
-            self,
-            target_value: float,
-            fee: float) -> float:
-        '''
+    def continuous_future_value(self, target_value: float, fee: float) -> float:
+        """
         Calculate the future value for a given present value using the continuous capitalization regime.
 
         Parameters
@@ -211,16 +211,15 @@ class capitalization_regime:
         >>> cr = capitalization_regime(term=5, day_basis=1)
         >>> cr.continuous_future_value(20000, 0.09)
         31366.24
-        '''
+        """
         euler_number = math.e
-        future_value = target_value * (euler_number) ** (fee * (self.term / self.day_basis))
+        future_value = target_value * (euler_number) ** (
+            fee * (self.term / self.day_basis)
+        )
         return future_value
 
-    def continuous_present_value(
-            self,
-            target_value: float,
-            fee: float) -> float:
-        '''
+    def continuous_present_value(self, target_value: float, fee: float) -> float:
+        """
         Calculate the present value for a given future value using the continuous capitalization regime.
 
         Parameters
@@ -245,16 +244,17 @@ class capitalization_regime:
         >>> cr = capitalization_regime(term=5, day_basis=1)
         >>> cr.continuous_present_value(31229.238405, 0.09)
         20000.0
-        '''
+        """
         euler_number = math.e
-        future_value = target_value / (euler_number) ** (fee * (self.term / self.day_basis))
+        future_value = target_value / (euler_number) ** (
+            fee * (self.term / self.day_basis)
+        )
         return future_value
 
     def continuous_effective_transaction_rate(
-            self,
-            future_target_value: float,
-            present_target_value: float) -> float:
-        '''
+        self, future_target_value: float, present_target_value: float
+    ) -> float:
+        """
         Calculate the effective transaction rate for continuous capitalization, based on present and future values.
 
         Parameters
@@ -280,13 +280,15 @@ class capitalization_regime:
         >>> cr = capitalization_regime(term=3, day_basis=1)
         >>> cr.continuous_effective_transaction_rate(105.0, 100.0)
         0.016263
-        '''
-        etr = math.log(future_target_value / present_target_value) / (self.term / self.day_basis)
+        """
+        etr = math.log(future_target_value / present_target_value) / (
+            self.term / self.day_basis
+        )
         return etr
 
 
 class uniform_payments_series:
-    '''
+    """
     Provides methods for calculating present value, future value, and payment values for uniform (equal) payment series
     under various conditions, including deferred (ordinary) and advance (annuity due) schemes.
 
@@ -321,16 +323,16 @@ class uniform_payments_series:
       advance (annuity due) series—payments at the beginning of periods.
     - These methods can be used for classical financial math problems such as loans (installment calculation),
       saving plans, or any context involving regular payments.
-    '''
+    """
+
     def __init__(self, term, day_basis):
         self.term = term
         self.day_basis = day_basis
 
     def deferred_uniform_payments_series(
-            self,
-            fee: float,
-            present_target_value: float = 1.00) -> float:
-        '''
+        self, fee: float, present_target_value: float = 1.00
+    ) -> float:
+        """
         Calculate the value of each payment in a deferred uniform payments series and the financing coefficient.
 
         Parameters
@@ -360,20 +362,23 @@ class uniform_payments_series:
         >>> ups = uniform_payments_series(term=12, day_basis=1)
         >>> ups.deferred_uniform_payments_series(0.02, 1000)
         (94.56, 0.09)
-        '''
-        payments_value = present_target_value * (((1 + fee) ** (self.term / self.day_basis)) * fee) / (
-            ((1 + fee) ** (self.term / self.day_basis)) - 1)
+        """
+        payments_value = (
+            present_target_value
+            * (((1 + fee) ** (self.term / self.day_basis)) * fee)
+            / (((1 + fee) ** (self.term / self.day_basis)) - 1)
+        )
 
         financing_coef = (((1 + fee) ** (self.term / self.day_basis)) * fee) / (
-            ((1 + fee) ** (self.term / self.day_basis)) - 1)
+            ((1 + fee) ** (self.term / self.day_basis)) - 1
+        )
 
         return payments_value, financing_coef
 
     def present_value_deferred_uniform_series(
-            self,
-            fee: float,
-            payments: float = 1.00) -> float:
-        '''
+        self, fee: float, payments: float = 1.00
+    ) -> float:
+        """
         Calculate the present value for a deferred uniform payments series given the payment amount and rate.
 
         Parameters
@@ -400,17 +405,19 @@ class uniform_payments_series:
         >>> ups = uniform_payments_series(term=12, day_basis=1)
         >>> ups.present_value_deferred_uniform_series(0.02, 100)
         1057.53
-        '''
-        present_value = payments * (((1 + fee) ** (self.term / self.day_basis)) - 1) / (
-            ((1 + fee) ** (self.term / self.day_basis)) * fee)
+        """
+        present_value = (
+            payments
+            * (((1 + fee) ** (self.term / self.day_basis)) - 1)
+            / (((1 + fee) ** (self.term / self.day_basis)) * fee)
+        )
 
         return present_value
 
     def advance_uniform_payments_series(
-            self,
-            fee: float,
-            present_target_value: float = 1.00) -> float:
-        '''
+        self, fee: float, present_target_value: float = 1.00
+    ) -> float:
+        """
         Calculate the value of each payment in an advance (annuity due) uniform payments series and the
         corresponding financing coefficient.
 
@@ -439,20 +446,27 @@ class uniform_payments_series:
         >>> ups = uniform_payments_series(term=12, day_basis=1)
         >>> ups.advance_uniform_payments_series(0.02, 1000)
         (92.71, 0.09)
-        '''
-        payments_value = present_target_value * ((((1 + fee) ** (self.term / self.day_basis)) * fee) / (
-            ((1 + fee) ** (self.term / self.day_basis)) - 1)) * (1 / (1 + fee))
+        """
+        payments_value = (
+            present_target_value
+            * (
+                (((1 + fee) ** (self.term / self.day_basis)) * fee)
+                / (((1 + fee) ** (self.term / self.day_basis)) - 1)
+            )
+            * (1 / (1 + fee))
+        )
 
-        financing_coef = ((((1 + fee) ** (self.term / self.day_basis)) * fee) / (
-            ((1 + fee) ** (self.term / self.day_basis)) - 1)) * (1 / (1 + fee))
+        financing_coef = (
+            (((1 + fee) ** (self.term / self.day_basis)) * fee)
+            / (((1 + fee) ** (self.term / self.day_basis)) - 1)
+        ) * (1 / (1 + fee))
 
         return payments_value, financing_coef
 
     def present_value_advance_uniform_series(
-            self,
-            fee: float,
-            payments: float = 1.00) -> float:
-        '''
+        self, fee: float, payments: float = 1.00
+    ) -> float:
+        """
         Calculate the present value of an advance (annuity due) uniform payment series for a given payment and rate.
 
         Parameters
@@ -478,18 +492,20 @@ class uniform_payments_series:
         >>> ups = uniform_payments_series(term=12, day_basis=1)
         >>> ups.present_value_advance_uniform_series(0.02, 100)
         1078.68
-        '''
-        present_value = payments * (((1 + fee) ** (self.term / self.day_basis)) - 1) / (
-            ((1 + fee) ** (self.term / self.day_basis)) * fee) * (1 + fee)
+        """
+        present_value = (
+            payments
+            * (((1 + fee) ** (self.term / self.day_basis)) - 1)
+            / (((1 + fee) ** (self.term / self.day_basis)) * fee)
+            * (1 + fee)
+        )
 
         return present_value
 
     def future_value_uniform_payments_series(
-            self,
-            fee: float,
-            payments: float = 1.00,
-            future_target_value: float = 1.00) -> float:
-        '''
+        self, fee: float, payments: float = 1.00, future_target_value: float = 1.00
+    ) -> float:
+        """
         Calculate the future value of a uniform payment series (ordinary annuity) and the required payment amount
         for a given future value.
 
@@ -519,15 +535,19 @@ class uniform_payments_series:
         The calculation uses the formula:
         - FV = payments * [((1 + fee)^(term/day_basis) - 1) / fee]
         - Payment = future_target_value * [fee / ((1 + fee)^(term/day_basis) - 1)]
-        '''
-        future_value = payments * (((1 + fee) ** (self.term / self.day_basis)) - 1) / fee
-        payments_value = future_target_value * (fee / (((1 + fee) ** (self.term / self.day_basis)) - 1))
+        """
+        future_value = (
+            payments * (((1 + fee) ** (self.term / self.day_basis)) - 1) / fee
+        )
+        payments_value = future_target_value * (
+            fee / (((1 + fee) ** (self.term / self.day_basis)) - 1)
+        )
 
         return future_value, payments_value
 
 
 class investment_evaluation_methods:
-    '''
+    """
     Provides static methods for classical investment appraisal: Net Present Value (NPV)
     and Internal Rate of Return (IRR). Supports calculation of NPV with time-varying discount
     rates (non-uniform cash flows and rates) and traditional IRR with a constant rate.
@@ -548,10 +568,11 @@ class investment_evaluation_methods:
     rates is not recommended and may produce misleading results.
     - These methods are fundamental tools in financial mathematics for investment decisions, capital budgeting,
     and comparing project alternatives.
-    '''
+    """
+
     @staticmethod
     def net_present_value(flows: list, rates: list) -> float:
-        '''
+        """
         Calculate the Net Present Value (NPV) for a series of cash flows and discount rates that may vary over time.
 
         Parameters
@@ -580,22 +601,24 @@ class investment_evaluation_methods:
         >>> rates = [0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08]
         >>> net_present_value(flows, rates)
         27386.45
-        '''
+        """
         if len(flows) != len(rates):
-            raise ValueError("The lists of cash flows and rates must have the same length.")
+            raise ValueError(
+                "The lists of cash flows and rates must have the same length."
+            )
 
         npv = 0.0
         discount_factor = 1.0
         for t in range(len(flows)):
             if t > 0:
-                discount_factor *= (1 + rates[t])
+                discount_factor *= 1 + rates[t]
             npv += flows[t] / discount_factor
 
         return npv
 
     @staticmethod
     def internal_rate_return(flows: list) -> float:
-        '''
+        """
         Calculate the Internal Rate of Return (IRR) for a series of cash flows using a constant rate.
 
         Parameters
@@ -621,6 +644,6 @@ class investment_evaluation_methods:
         >>> flows = [-10000.00, 2500.00, 2500.00, 2500.00, 3000.00, 3000.00]
         >>> internal_rate_return(flows)
         0.1048
-        '''
+        """
         irr = npf.irr(flows)
         return irr
