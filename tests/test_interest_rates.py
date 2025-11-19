@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from src.interest_rates.interest_rates import equivalent_rates
+from financial_calc.interest_rates.interest_rates import equivalent_rates
 
 
 @pytest.mark.parametrize(
