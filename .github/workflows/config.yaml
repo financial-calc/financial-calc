@@ -19,8 +19,6 @@ jobs:
       - name: Install requirements
         run: |
           pip install poetry
-          poetry self add poetry-plugin-shell
-          poetry shell
           poetry install --no-root
 
       - name: Run tests
