@@ -2,7 +2,7 @@ name: deploy-financial-calc-library
 
 on:
   push:
-    branches: 
+    branches:
       - main
 
 jobs:
@@ -17,13 +17,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
+      - name: Install Just
         run: |
-          pip install poetry
-          poetry install --no-root
+          sudo apt-get update
+          sudo apt-get install -y just
+
+      - name: Install dependencies
+        run: just install
 
       - name: Run tests
-        run: poetry run pytest
+        run: just test
 
   deploy:
     name: Upload the package to TestPyPI and PyPI
@@ -37,27 +40,28 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install Just
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y just
+
       - name: Install packaging tools
         run: |
           pip install poetry twine
 
       - name: Build package
-        run: |
-          rm -rf dist
-          poetry build
+        run: just build
 
       # ---- TestPyPI ----
       - name: Upload to TestPyPI
         env:
           TWINE_USERNAME: ${{ secrets.TEST_PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
-        run: |
-          twine upload -r testpypi dist/*
+        run: just publish-testpypi
 
       # ---- PyPI ----
       - name: Upload to PyPI
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          twine upload dist/*
+        run: just publish-pypi
