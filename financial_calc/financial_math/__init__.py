@@ -1,4 +1,4 @@
-from financial_math import (
+from financial_calc.financial_math.financial_math import (
     capitalization_regime,
     uniform_payments_series,
     investment_evaluation_methods,
