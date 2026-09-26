@@ -272,3 +272,45 @@ def test_internal_rate_return(flows, expected_result):
     irr = iem.internal_rate_return(flows)
     irr = round(irr, 4) * 100
     assert irr == expected_result
+
+
+def test_pv_as_df_exp(cap_regime_data):
+    cr = capitalization_regime(
+        term="term",
+        day_basis=252,
+        df=cap_regime_data
+    )
+    df_vp = cr.discrete_present_value(
+        target_value="target_value",
+        fee="fee", 
+        capitalization_regime="exp"
+    ).round(2)
+
+    df_vp1 = df_vp["present_value"][0]
+    df_vp2 = df_vp["present_value"][1]
+    df_vp3 = df_vp["present_value"][2]
+    
+    assert df_vp1 == 9887.18   
+    assert df_vp2 == 19636.86
+    assert df_vp3 == 29481.78
+
+
+def test_pv_as_df_lin(cap_regime_data):
+    cr = capitalization_regime(
+        term="term",
+        day_basis=252,
+        df=cap_regime_data
+    )
+    df_vp = cr.discrete_present_value(
+        target_value="target_value",
+        fee="fee", 
+        capitalization_regime="lin"
+    ).round(2)
+
+    df_vp1 = df_vp["present_value"][0]
+    df_vp2 = df_vp["present_value"][1]
+    df_vp3 = df_vp["present_value"][2]
+    
+    assert df_vp1 == 9882.35   
+    assert df_vp2 == 19626.17
+    assert df_vp3 == 29473.68

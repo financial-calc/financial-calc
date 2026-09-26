@@ -11,7 +11,8 @@ requires-python = ">=3.12"
 # Necessary dependencies to the package works
 dependencies = [
     "numpy-financial >=1.0.0,<2.0.0",
-    "numpy >=2.3.4,<3.0.0"
+    "numpy >=2.3.4,<3.0.0",
+    "pandas (>=3.0.5,<4.0.0)"
 ]
 
 [build-system]

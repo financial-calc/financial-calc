@@ -4,6 +4,7 @@ Author: Vitor Beltrao Abdo - vitorbeltrao300@gmail.com
 """
 
 import math
+import pandas as pd
 import numpy_financial as npf
 
 
@@ -14,24 +15,19 @@ class capitalization_regime:
 
     Parameters
     ----------
-    term : int or float
+    term : int or str
         The period, denominated strictly in days, over which the capitalization or discount is applied.
-    day_basis : int or float
+    day_basis : int
         The base period for interest rate conversion, also in days. Typical values are:
-            - daily       = 1
-            - monthly     = 30
+            - daily = 1
+            - monthly = 30
             - working month (useful) = 21
-            - quarterly   = 90
+            - quarterly = 90
             - yearly (useful) = 252
-            - yearly      = 360
+            - yearly = 360
             etc.
-
-    Attributes
-    ----------
-    term : int or float
-        The period, in days, for the calculation.
-    day_basis : int or float
-        The basis of calculation, in days, defining how the rates are interpreted for period conversion.
+    df : pd.DataFrame or None, default=None
+        Optional DataFrame if you want to work with dataframes instead of scalar values.
 
     Notes
     -----
@@ -45,21 +41,22 @@ class capitalization_regime:
       an annualized rate (basis 360 days) to be applied over any number of days.
     """
 
-    def __init__(self, term, day_basis):
+    def __init__(self, term: int | str, day_basis: int, df: pd.DataFrame | None = None):
         self.term = term
         self.day_basis = day_basis
+        self.df = df
 
     def discrete_present_value(
-        self, target_value: float, fee: float, capitalization_regime: str = "exp"
+        self, target_value: float | str, fee: float | str, capitalization_regime: str = "exp"
     ) -> float:
         """
         Calculate the present value for a given future value using the specified capitalization regime.
 
         Parameters
         ----------
-        target_value : float
+        target_value : float | str
             The future value to be discounted to the present.
-        fee: float
+        fee: float | str
             The fee used in the capitalization regime.
         capitalization_regime : {'exp', 'lin'}, default='exp'
             The regime of capitalization:
@@ -68,7 +65,7 @@ class capitalization_regime:
 
         Returns
         -------
-        present_value : float
+        present_value : float or pd.DataFrame
             The present value corresponding to the given future value.
 
         Notes
@@ -83,13 +80,23 @@ class capitalization_regime:
         >>> cr.discrete_present_value(30000, 0.08, capitalization_regime='exp')
         20417.5
         """
-        if capitalization_regime == "lin":
+        if self.df is None and capitalization_regime == "lin":
             present_value = target_value / (1 + (fee * self.term / self.day_basis))
             return present_value
 
-        elif capitalization_regime == "exp":
+        # usage with DataFrame
+        elif self.df is not None and capitalization_regime == "lin":
+            self.df["present_value"] = self.df[target_value] / (1 + (self.df[fee] * self.df[self.term] / self.day_basis))
+            return self.df
+
+        elif self.df is None and capitalization_regime == "exp":
             present_value = target_value / (1 + fee) ** (self.term / self.day_basis)
             return present_value
+
+        # usage with DataFrame
+        elif self.df is not None and capitalization_regime == "exp":
+            self.df["present_value"] = self.df[target_value] / (1 + self.df[fee]) ** (self.df[self.term] / self.day_basis)
+            return self.df
 
     def discrete_future_value(
         self, target_value: float, fee: float, capitalization_regime: str = "exp"
@@ -99,9 +106,9 @@ class capitalization_regime:
 
         Parameters
         ----------
-        target_value : float
+        target_value : float | str
             The present value to be compounded to the future.
-        fee: float
+        fee: float | str
             The fee used in the capitalization regime.
         capitalization_regime : {'exp', 'lin'}, default='exp'
             The regime of capitalization:
@@ -110,7 +117,7 @@ class capitalization_regime:
 
         Returns
         -------
-        future_value : float
+        future_value : float or pd.DataFrame
             The future value corresponding to the given present value.
 
         Notes
@@ -125,13 +132,23 @@ class capitalization_regime:
         >>> cr.discrete_future_value(20000, 0.09, capitalization_regime='lin')
         29000.0
         """
-        if capitalization_regime == "lin":
-            present_value = target_value * (1 + (fee * self.term / self.day_basis))
-            return present_value
+        if self.df is None and capitalization_regime == "lin":
+            future_value = target_value * (1 + (fee * self.term / self.day_basis))
+            return future_value
 
-        elif capitalization_regime == "exp":
-            present_value = target_value * (1 + fee) ** (self.term / self.day_basis)
-            return present_value
+        # usage with DataFrame
+        elif self.df is not None and capitalization_regime == "lin":
+            self.df["future_value"] = self.df[target_value] * (1 + (self.df[fee] * self.df[self.term] / self.day_basis))
+            return self.df
+
+        elif self.df is None and capitalization_regime == "exp":
+            future_value = target_value * (1 + fee) ** (self.term / self.day_basis)
+            return future_value
+
+        # usage with DataFrame
+        elif self.df is not None and capitalization_regime == "exp":
+            self.df["future_value"] = self.df[target_value] * (1 + self.df[fee]) ** (self.df[self.term] / self.day_basis)
+            return self.df
 
     def discrete_effective_transaction_rate(
         self,
