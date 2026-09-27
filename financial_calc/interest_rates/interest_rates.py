@@ -3,8 +3,14 @@ Financial interest rates operations
 Author: Vitor Beltrao Abdo - vitorbeltrao300@gmail.com
 """
 
+import pandas as pd
+
 
 class equivalent_rates:
+    """
+    A class to calculate equivalent interest rates for different 
+    capitalization regimes and period conversions.
+    """
 
     def __init__(
         self,
@@ -74,3 +80,43 @@ class equivalent_rates:
                 )
             ) - 1
             return required_rate
+
+
+class GetEffectiveRate:
+    """
+    A class to handle effective interest rate calculations.
+
+    Parameters
+    ----------
+    df : pd.DataFrame, optional
+        Optional DataFrame if you want to work with dataframes instead of scalar values.
+    """
+
+    def __init__(self, df: pd.DataFrame | None = None):
+        self.df = df
+
+    def nominal_rate_to_effective(self, nominal_rate: float, compounding_periods: float) -> float:
+        """
+        Convert a nominal interest rate to an effective interest rate.
+
+        Parameters
+        ----------
+        nominal_rate : float
+            The nominal interest rate (in decimal form).
+        compounding_periods : int
+            The number of compounding periods contained within the 
+            time unit in which the nominal rate is expressed.
+
+        Returns
+        -------
+        effective_rate : float
+            The effective interest rate (in decimal form).
+        """
+
+        if self.df is None:
+            effective_rate = nominal_rate / compounding_periods
+            return effective_rate
+
+        if self.df is not None:
+            self.df["effective_rate"] = self.df["nominal_rate"] / self.df["compounding_periods"]
+            return self.df
