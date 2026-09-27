@@ -1,7 +1,9 @@
 import pytest
 import numpy as np
-from financial_calc.interest_rates.interest_rates import equivalent_rates
-
+from financial_calc.interest_rates.interest_rates import(
+    equivalent_rates,
+    GetEffectiveRate
+)
 
 @pytest.mark.parametrize(
     "term_to_convert, day_basis_to_convert, rate_to_convert, required_term, required_day_basis, expected_result",
@@ -28,7 +30,7 @@ def test_calculate_equivalent_rates1(
         required_day_basis,
     )
     rr = er.calculate_equivalent_rates(capitalization_regime="lin")
-    rr = round(rr, 4) * 100
+    rr = round(rr * 100, 2)
     assert rr == expected_result
 
 
@@ -38,8 +40,9 @@ def test_calculate_equivalent_rates1(
         (360, 360, 0.30, 360, 90, 6.78),
         (360, 30, 0.03, 360, 360, 42.58),
         (30, 30, 0.04, 30, 1, 0.13),
-        # (21, 21, 0.053, 30, 1, 0.13),
-        (30, 30, 0.04, 30, 1, 0.13),
+        (21, 21, 0.053, 21, 1, 0.25),
+        (12, 12, 0.025, 1, 12, 34.49)
+
     ],
 )
 def test_calculate_equivalent_rates2(
@@ -58,5 +61,20 @@ def test_calculate_equivalent_rates2(
         required_day_basis,
     )
     rr = er.calculate_equivalent_rates(capitalization_regime="exp")
-    rr = round(rr, 4) * 100
+    rr = round(rr * 100, 2)
     assert rr == expected_result
+
+
+@pytest.mark.parametrize(
+    "nominal_rate, compounding_periods, expected_result",
+    [
+        (0.24, 12.0, 2.00),
+        (0.30, 4.0, 7.50),
+        (0.03, 1/12, 36.00)
+    
+    ],
+)
+def test_nominal_rate_to_effective(nominal_rate, compounding_periods, expected_result):
+    ger = GetEffectiveRate()
+    effective_rate = ger.nominal_rate_to_effective(nominal_rate, compounding_periods)
+    assert round(effective_rate * 100, 2) == expected_result
